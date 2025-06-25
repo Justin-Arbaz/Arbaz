@@ -68,24 +68,60 @@ document.getElementById('filterForm').addEventListener('submit', function (e) {
 });
 
 
-document.querySelectorAll('.carousel .carousel-item img').forEach(img => {
-  img.style.cursor = 'pointer';
+// document.querySelectorAll('.carousel .carousel-item img').forEach(img => {
+//   img.style.cursor = 'pointer';
 
-  img.addEventListener('click', function (e) {
-    const rect = img.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+//   img.addEventListener('click', function (e) {
+//     const rect = img.getBoundingClientRect();
+//     const x = e.clientX - rect.left;
 
-    const carousel = img.closest('.carousel');
+//     const carousel = img.closest('.carousel');
 
-    if (x > rect.width / 2) {
-      // Clicked right side – go to next
-      bootstrap.Carousel.getInstance(carousel).next();
-    } else {
-      // Clicked left side – go to previous
-      bootstrap.Carousel.getInstance(carousel).prev();
-    }
+//     if (x > rect.width / 2) {
+//       // Clicked right side – go to next
+//       bootstrap.Carousel.getInstance(carousel).next();
+//     } else {
+//       // Clicked left side – go to previous
+//       bootstrap.Carousel.getInstance(carousel).prev();
+//     }
+//   });
+// });
+
+document.querySelectorAll('#galleryCarousel .carousel-item img').forEach(img => {
+  img.style.cursor = 'zoom-in';
+
+  img.addEventListener('click', function () {
+    const src = img.getAttribute('src');
+
+    const overlay = document.createElement('div');
+    overlay.className = 'zoom-overlay';
+    overlay.innerHTML = `
+      <button class="close-zoom">&times;</button>
+      <img src="${src}" alt="Zoomed Image">
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('.close-zoom').onclick = () => overlay.remove();
+    overlay.onclick = (e) => {
+      if (e.target === overlay) overlay.remove();
+    };
   });
 });
+
+const carousel = document.getElementById('galleryCarousel');
+const counter = document.getElementById('slide-counter');
+const items = carousel.querySelectorAll('.carousel-item');
+const total = items.length;
+
+const updateCounter = () => {
+  const activeIndex = [...items].findIndex(item => item.classList.contains('active'));
+  counter.textContent = `${activeIndex + 1} out of ${total}`;
+};
+
+carousel.addEventListener('slid.bs.carousel', updateCounter);
+window.addEventListener('load', updateCounter);
+
+
 
 
 const modal = document.getElementById('galleryModal');
